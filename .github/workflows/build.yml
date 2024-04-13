@@ -45,8 +45,8 @@ jobs:
 #          name: RMG-Portable-Linux64-${{ env.GIT_REVISION }}
 #          path: Bin/*.AppImage
 #
-  Windows:
-    runs-on: windows-latest
+  Windows-GCC:
+    runs-on: windows-2019
     steps:
       - uses: actions/checkout@v4
         with:
@@ -92,10 +92,64 @@ jobs:
       - name: Upload RMG (Portable)
         uses: actions/upload-artifact@v4
         with:
-          name: RMG-Portable-Windows64-${{ env.GIT_REVISION }}
+          name: RMG-Portable-Windows64-mingw-${{ env.GIT_REVISION }}
           path: Bin/Release/*
       - name: Upload RMG (Installer)
         uses: actions/upload-artifact@v4
         with:
-          name: RMG-Setup-Windows64-${{ env.GIT_REVISION }}
+          name: RMG-Setup-Windows64-mingw-${{ env.GIT_REVISION }}
+          path: Bin/*.exe
+  Windows-CLANG:
+    runs-on: windows-latest
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+      - uses: hendrikmuhs/ccache-action@v1.2
+        with:
+          key: Windows
+      - uses: msys2/setup-msys2@v2
+        with:
+          path-type: inherit
+          update: true
+          install: >-
+            make
+            mingw-w64-clang-x86_64-cmake
+            mingw-w64-clang-x86_64-ninja
+            mingw-w64-clang-x86_64-gcc
+            mingw-w64-clang-x86_64-hidapi
+            mingw-w64-clang-x86_64-freetype
+            mingw-w64-clang-x86_64-libpng
+            mingw-w64-clang-x86_64-SDL2
+            mingw-w64-clang-x86_64-qt6
+            mingw-w64-clang-x86_64-SDL2
+            mingw-w64-clang-x86_64-hidapi
+            mingw-w64-clang-x86_64-speexdsp
+            mingw-w64-clang-x86_64-libsamplerate
+            mingw-w64-clang-x86_64-nasm
+            mingw-w64-clang-x86_64-minizip
+            mingw-w64-clang-x86_64-vulkan-headers
+            git
+      - name: Prepare Environment
+        run: |
+          $env:revision = git describe --tags --always
+          echo "GIT_REVISION=$env:revision" >> $env:GITHUB_ENV
+        shell: pwsh
+      - name: Build RMG (Portable)
+        run: ./Source/Script/Build.sh Release
+        shell: msys2 {0}
+      - name: Create Installer
+        run: .\Build\Release\Source\Installer\CreateInstaller.bat
+      - name: Configure RMG (Portable)
+        run: touch Bin/Release/portable.txt
+        shell: msys2 {0}
+      - name: Upload RMG (Portable)
+        uses: actions/upload-artifact@v4
+        with:
+          name: RMG-Portable-Windows64-msys2-${{ env.GIT_REVISION }}
+          path: Bin/Release/*
+      - name: Upload RMG (Installer)
+        uses: actions/upload-artifact@v4
+        with:
+          name: RMG-Setup-Windows64-msys2-${{ env.GIT_REVISION }}
           path: Bin/*.exe

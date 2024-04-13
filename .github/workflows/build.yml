@@ -84,6 +84,9 @@ jobs:
       - name: Build RMG (Portable)
         run: ./Source/Script/Build.sh Release
         shell: msys2 {0}
+      - name: Strip Binaries
+        run: strip -s Bin/Release/*.exe
+        shell: msys2 {0}
       - name: Create Installer
         run: .\Build\Release\Source\Installer\CreateInstaller.bat
       - name: Configure RMG (Portable)
@@ -141,6 +144,9 @@ jobs:
         shell: pwsh
       - name: Build RMG (Portable)
         run: ./Source/Script/Build.sh Release
+      - name: Strip Binaries
+        run: strip -s Bin/Release/*.exe
+        shell: msys2 {0}
       - name: Create Installer
         run: .\Build\Release\Source\Installer\CreateInstaller.bat
       - name: Configure RMG (Portable)

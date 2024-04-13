@@ -3,6 +3,23 @@
 #
 cmake_minimum_required(VERSION 3.15)
 
+# Enable link time optimization if supported by compiler
+include(CheckIPOSupported)
+check_ipo_supported(RESULT result)
+if(result)
+    set(CMAKE_INTERPROCEDURAL_OPTIMIZATION TRUE)
+endif()
+
+# Set position independent code
+set(CMAKE_POSITION_INDEPENDENT_CODE ON)
+
+# Enable O2 compiler optimizations
+if (MSVC)
+    add_compile_options(/O2 /arch:AVX2 favor:INTEL64)
+else()
+    add_compile_options(-Ofast)
+endif()
+
 option(PORTABLE_INSTALL "Portable Installation" ON)
 option(UPDATER          "Enables updater" ${WIN32})
 option(APPIMAGE_UPDATER "Enables AppImage updater" OFF)

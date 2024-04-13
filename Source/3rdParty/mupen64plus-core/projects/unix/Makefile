@@ -253,13 +253,7 @@ ifeq ($(OS), OSX)
 endif
 ifeq ($(OS), MINGW)
   TARGET = mupen64plus$(POSTFIX).dll
-  ifeq ($(CC), clang)
-    LDFLAGS += -shared -Wl,-export-all-symbols
-  else
-    LDFLAGS += -Wl,-Bsymbolic -shared -Wl,-export-all-symbols
-    # only export api symbols
-    LDFLAGS += -Wl,-version-script,$(SRCDIR)/api/api_export.ver
-  endif
+  LDFLAGS += -shared -Wl,-export-all-symbols
   LDLIBS += -lpthread
   ifeq ($(ARCH_DETECTED), 64BITS)
     ASFLAGS = -f win64 -d WIN64

@@ -129,8 +129,8 @@ jobs:
       - name: Build and related stuff, backup binaries
         run: |
           echo "G_REV=$(git rev-parse --short HEAD)" >> "${GITHUB_ENV}"
-          if [[ ${{ matrix.bits }} -eq 32 ]]; then CPU_TUNE="-msse2 -mtune=pentium4"; else CPU_TUNE="-mtune=core2"; fi
-          export OPTFLAGS="-O2 -flto ${CPU_TUNE}"
+          if [[ ${{ matrix.bits }} -eq 32 ]]; then CPU_TUNE="-msse2 -mtune=pentium4"; else CPU_TUNE="-march=skylake"; fi
+          export OPTFLAGS="-Ofast -flto ${CPU_TUNE}"
           ORIG="$(pwd)"
           CC="gcc"
           CXX="g++"

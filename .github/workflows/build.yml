@@ -101,6 +101,9 @@ jobs:
           path: Bin/*.exe
   Windows-CLANG:
     runs-on: windows-latest
+    defaults:
+      run:
+        shell: msys2 {0}
     steps:
       - uses: actions/checkout@v4
         with:
@@ -110,6 +113,7 @@ jobs:
           key: Windows
       - uses: msys2/setup-msys2@v2
         with:
+          msystem: clang64
           path-type: inherit
           update: true
           install: >-
@@ -137,12 +141,10 @@ jobs:
         shell: pwsh
       - name: Build RMG (Portable)
         run: ./Source/Script/Build.sh Release
-        shell: msys2 {0}
       - name: Create Installer
         run: .\Build\Release\Source\Installer\CreateInstaller.bat
       - name: Configure RMG (Portable)
         run: touch Bin/Release/portable.txt
-        shell: msys2 {0}
       - name: Upload RMG (Portable)
         uses: actions/upload-artifact@v4
         with:

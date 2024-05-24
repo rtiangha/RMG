@@ -147,8 +147,6 @@ jobs:
       - name: Strip Binaries
         run: strip -s Bin/Release/*.exe
         shell: msys2 {0}
-      - name: Create Installer
-        run: .\Build\Release\Source\Installer\CreateInstaller.bat
       - name: Configure RMG (Portable)
         run: touch Bin/Release/portable.txt
       - name: Upload RMG (Portable)
@@ -156,8 +154,3 @@ jobs:
         with:
           name: RMG-Portable-Windows64-msys2-${{ env.GIT_REVISION }}
           path: Bin/Release/*
-      - name: Upload RMG (Installer)
-        uses: actions/upload-artifact@v4
-        with:
-          name: RMG-Setup-Windows64-msys2-${{ env.GIT_REVISION }}
-          path: Bin/*.exe

@@ -14,7 +14,6 @@
 
 #include <QMessageBox>
 #include <QFileInfo>
-#include <iostream>
 
 #include <RMG-Core/Core.hpp>
 
@@ -48,7 +47,7 @@ void CheatsDialog::loadCheats(void)
 
     if (!CoreGetCurrentCheats(cheats))
     {
-        this->showErrorMessage("CoreGetCurrentCheats() Failed!", QString::fromStdString(CoreGetError()));
+        this->showErrorMessage("CoreGetCurrentCheats() Failed", QString::fromStdString(CoreGetError()));
         this->failedToParseCheats = true;
         return;
     }
@@ -95,6 +94,10 @@ void CheatsDialog::loadCheats(void)
                 if (foundParent != nullptr)
                 {
                     foundParent->addChild(item);
+                }
+                else
+                {
+                    delete item;
                 }
 
                 // when the cheat is enabled & we're at the last item,
@@ -308,7 +311,7 @@ void CheatsDialog::on_removeCheatButton_clicked(void)
     // try to remove cheat
     if (!CoreRemoveCheat(cheat))
     {
-        this->showErrorMessage("CoreRemoveCheat() Failed!", QString::fromStdString(CoreGetError()));
+        this->showErrorMessage("CoreRemoveCheat() Failed", QString::fromStdString(CoreGetError()));
         return;
     }
 
@@ -322,7 +325,7 @@ void CheatsDialog::accept(void)
 
     if (!CoreApplyCheats())
     {
-        this->showErrorMessage("CoreApplyCheats() Failed!", QString::fromStdString(CoreGetError()));
+        this->showErrorMessage("CoreApplyCheats() Failed", QString::fromStdString(CoreGetError()));
         return;
     }
 

@@ -1340,7 +1340,7 @@ void MainWindow::on_networkAccessManager_Finished(QNetworkReply* reply)
     {
         if (!this->ui_SilentUpdateCheck)
         {
-            this->showErrorMessage("Failed to check for updates!", reply->errorString());
+            this->showErrorMessage("Failed to check for updates", reply->errorString());
         }
         reply->deleteLater();
         return;
@@ -1359,7 +1359,7 @@ void MainWindow::on_networkAccessManager_Finished(QNetworkReply* reply)
     {
         if (!this->ui_SilentUpdateCheck)
         {
-            this->showErrorMessage("You're already on the latest version!");
+            this->showErrorMessage("You're already on the latest version");
         }
         return;
     }
@@ -1481,7 +1481,7 @@ void MainWindow::on_Action_System_Shutdown(void)
 
     if (!CoreStopEmulation())
     {
-        this->showErrorMessage("CoreStopEmulation() Failed!", QString::fromStdString(CoreGetError()));
+        this->showErrorMessage("CoreStopEmulation() Failed", QString::fromStdString(CoreGetError()));
     }
 }
 
@@ -1494,7 +1494,7 @@ void MainWindow::on_Action_System_SoftReset(void)
 {
     if (!CoreResetEmulation(false))
     {
-        this->showErrorMessage("CoreResetEmulation() Failed!", QString::fromStdString(CoreGetError()));
+        this->showErrorMessage("CoreResetEmulation() Failed", QString::fromStdString(CoreGetError()));
     }
 }
 
@@ -1502,7 +1502,7 @@ void MainWindow::on_Action_System_HardReset(void)
 {
     if (!CoreResetEmulation(true))
     {
-        this->showErrorMessage("CoreResetEmulation() Failed!", QString::fromStdString(CoreGetError()));
+        this->showErrorMessage("CoreResetEmulation() Failed", QString::fromStdString(CoreGetError()));
     }
 }
 void MainWindow::on_Action_System_Pause(void)
@@ -1515,12 +1515,12 @@ void MainWindow::on_Action_System_Pause(void)
     if (!isPaused)
     {
         ret = CorePauseEmulation();
-        error = "CorePauseEmulation() Failed!";
+        error = "CorePauseEmulation() Failed";
     }
     else
     {
         ret = CoreResumeEmulation();
-        error = "CoreResumeEmulation() Failed!";
+        error = "CoreResumeEmulation() Failed";
     }
 
     if (!ret)
@@ -1536,7 +1536,7 @@ void MainWindow::on_Action_System_Screenshot(void)
 {
     if (!CoreTakeScreenshot())
     {
-        this->showErrorMessage("CoreTakeScreenshot() Failed!", QString::fromStdString(CoreGetError()));
+        this->showErrorMessage("CoreTakeScreenshot() Failed", QString::fromStdString(CoreGetError()));
     }
 }
 
@@ -1550,7 +1550,7 @@ void MainWindow::on_Action_System_LimitFPS(void)
 
     if (!ret)
     {
-        this->showErrorMessage("CoreSetSpeedLimiterState() Failed!", QString::fromStdString(CoreGetError()));
+        this->showErrorMessage("CoreSetSpeedLimiterState() Failed", QString::fromStdString(CoreGetError()));
     }
 }
 
@@ -1558,7 +1558,7 @@ void MainWindow::on_Action_System_SpeedFactor(int factor)
 {
     if (!CoreSetSpeedFactor(factor))
     {
-        this->showErrorMessage("CoreSetSpeedFactor() Failed!", QString::fromStdString(CoreGetError()));
+        this->showErrorMessage("CoreSetSpeedFactor() Failed", QString::fromStdString(CoreGetError()));
     }
 }
 
@@ -1587,20 +1587,24 @@ void MainWindow::on_Action_System_SaveAs(void)
         this->on_Action_System_Pause();
     }
 
-    QString fileName = QFileDialog::getSaveFileName(this, tr("Save State"), "", tr("Save State (*.state);;All Files (*)"));
+    QString fileName = QFileDialog::getSaveFileName(this, tr("Save State"), "", tr("Save State (*.state);;Project64 Save State (*.pj);;All Files (*)"));
 
     if (!fileName.isEmpty())
     {
         this->ui_ManuallySavedState = true;
 
-        if (!CoreSaveState(fileName.toStdU32String()))
+        CoreSaveStateType type = fileName.endsWith(".pj") ? 
+                                    CoreSaveStateType::Project64 :
+                                    CoreSaveStateType::Mupen64Plus;
+
+        if (!CoreSaveState(fileName.toStdU32String(), type))
         {
             this->ui_ManuallySavedState = false;
             this->showErrorMessage("CoreSaveState() Failed", QString::fromStdString(CoreGetError()));
         }
         else
         {
-            OnScreenDisplaySetMessage("Saved state to: " + fileName.toStdString());
+            OnScreenDisplaySetMessage("Saved state to: " + QDir::toNativeSeparators(fileName).toStdString());
         }
     }
 
@@ -1649,7 +1653,7 @@ void MainWindow::on_Action_System_Load(void)
         }
         else
         {
-            OnScreenDisplaySetMessage("State loaded from: " + fileName.toStdString());
+            OnScreenDisplaySetMessage("State loaded from: " + QDir::toNativeSeparators(fileName).toStdString());
         }
     }
 
@@ -2118,7 +2122,7 @@ void MainWindow::on_VidExt_Init(VidExtRenderMode renderMode)
 
         this->ui_Widgets->addWidget(this->ui_Widget_OpenGL->GetWidget());
     }
-    else
+    else if (renderMode == VidExtRenderMode::Vulkan)
     {
         this->ui_Widget_Vulkan = new Widget::VKWidget(this);
         this->ui_Widget_Vulkan->installEventFilter(this->ui_EventFilter);
@@ -2389,22 +2393,21 @@ void MainWindow::on_Core_DebugCallback(QList<CoreCallbackMessage> messages)
         return;
     }
 
-    const CoreCallbackMessage& statusbarMessage = messages.last();
-
-    if (!statusbarMessage.Context.startsWith("[CORE]"))
+    // attempt to find last core message
+    CoreCallbackMessage statusbarMessage = {};
+    qsizetype i = messages.size() - 1;
+    for (; i >= 0; i--)
     {
-        return;
+        if (messages[i].Context.startsWith("[CORE]") &&
+            messages[i].Type != CoreDebugMessageType::Verbose &&
+            !messages[i].Message.startsWith("IS64:"))
+        {
+            statusbarMessage = messages[i];
+            break;
+        }
     }
-
-    // drop verbose messages
-    if (statusbarMessage.Type == CoreDebugMessageType::Verbose)
-    {
-        return;
-    }
-
-    // drop IS64 messages
-    if (statusbarMessage.Message.startsWith("IS64:"))
-    {
+    if (i < 0)
+    { // no wanted core message found
         return;
     }
 
@@ -2578,12 +2581,14 @@ void MainWindow::on_VidExt_Quit(void)
     if (this->ui_VidExtRenderMode == VidExtRenderMode::OpenGL)
     {
         this->ui_Widgets->removeWidget(this->ui_Widget_OpenGL->GetWidget());
-        this->ui_Widget_OpenGL->destroy();
+        this->ui_Widget_OpenGL->GetWidget()->deleteLater();
+        this->ui_Widget_OpenGL = nullptr;
     }
-    else
+    else if (this->ui_VidExtRenderMode == VidExtRenderMode::Vulkan)
     {
         this->ui_Widgets->removeWidget(this->ui_Widget_Vulkan->GetWidget());
-        this->ui_Widget_Vulkan->destroy();
+        this->ui_Widget_Vulkan->GetWidget()->deleteLater();
+        this->ui_Widget_Vulkan = nullptr;
     }
 
     this->ui_VidExtRenderMode = VidExtRenderMode::Invalid;

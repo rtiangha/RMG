@@ -8,7 +8,8 @@
  *  along with this program. If not, see <https://www.gnu.org/licenses/>.
  */
 #include "InstallUpdateDialog.hpp"
-#include "RMG-Core/Error.hpp"
+
+#include <RMG-Core/Core.hpp>
 
 #include <QMessageBox>
 #include <QProcess>
@@ -39,7 +40,8 @@ void InstallUpdateDialog::install(void)
 
     QString appPath = QCoreApplication::applicationDirPath();
     QString appPid  = QString::number(QCoreApplication::applicationPid());
-    QString logPath = appPath + "/Cache/updater.log";
+    QString logPath = QString::fromStdU32String(CoreGetUserCacheDirectory().u32string()) + "/updater.log";
+
 
     // convert paths to use the right path seperator
     this->temporaryDirectory = QDir::toNativeSeparators(this->temporaryDirectory);
@@ -69,7 +71,7 @@ void InstallUpdateDialog::install(void)
             "   \"" + fullFilePath + "\" /CLOSEAPPLICATIONS /NOCANCEL /MERGETASKS=\"!desktopicon\"  /SILENT /DIR=\"" + appPath + "\"" + outputToLogLine,
             ")",
             "IF NOT ERRORLEVEL 0 (",
-            "   start \"\" cmd /c \"echo Rosalie's Mupen GUI failed to update, check the updater.log file in the Cache directory for more information && pause\"",
+            "   start \"\" cmd /c \"echo Rosalie's Mupen GUI failed to update, check the updater.log file in the user cache directory for more information && pause\"",
             ")",
             // remove temporary directory at last
             "rmdir /S /Q \"" + this->temporaryDirectory + "\"",
@@ -85,7 +87,7 @@ void InstallUpdateDialog::install(void)
     QDir dir(this->temporaryDirectory);
     if (!dir.mkdir("extract"))
     {
-        this->showErrorMessage("QDir::mkdir() Failed!", "");
+        this->showErrorMessage("QDir::mkdir() Failed", "");
         this->reject();
         return;
     }
@@ -96,7 +98,7 @@ void InstallUpdateDialog::install(void)
 
     if (!CoreUnzip(fullFilePath.toStdU32String(), extractDirectory.toStdU32String()))
     {
-        this->showErrorMessage("CoreUnzip() Failed!", QString::fromStdString(CoreGetError()));
+        this->showErrorMessage("CoreUnzip() Failed", QString::fromStdString(CoreGetError()));
         this->reject();
         return;
     }
@@ -120,7 +122,7 @@ void InstallUpdateDialog::install(void)
         "   start \"\" \""                 + appPath + "\\RMG.exe\""           + outputToLogLine,
         ")",
         "IF NOT ERRORLEVEL 0 (",
-        "   start \"\" cmd /c \"echo Rosalie's Mupen GUI failed to update, check the updater.log file in the Cache directory for more information && pause\"",
+        "   start \"\" cmd /c \"echo Rosalie's Mupen GUI failed to update, check the updater.log file in the user cache directory for more information && pause\"",
         ")",
         // remove temporary directory at last
         "rmdir /S /Q \"" + this->temporaryDirectory + "\"",
@@ -137,7 +139,7 @@ void InstallUpdateDialog::writeAndRunScript(QStringList stringList)
     QFile scriptFile(scriptPath);
     if (!scriptFile.open(QIODevice::WriteOnly | QIODevice::Text))
     {
-        this->showErrorMessage("QFile::open() Failed!", "");
+        this->showErrorMessage("QFile::open() Failed", "");
         return;
     }
 

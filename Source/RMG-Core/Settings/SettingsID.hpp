@@ -4,9 +4,7 @@
 enum class SettingsID
 {
     // GUI Settings
-    GUI_SettingsDialogWidth = 0,
-    GUI_SettingsDialogHeight,
-    GUI_HideCursorInEmulation,
+    GUI_HideCursorInEmulation = 0,
     GUI_HideCursorInFullscreenEmulation,
     GUI_StatusbarMessageDuration,
     GUI_PauseEmulationOnFocusLoss,
@@ -48,6 +46,11 @@ enum class SettingsID
     Core_64DD_DevelopmentIPL,
     Core_64DD_SaveDiskFormat,
 
+    // Core PIF ROM Settings
+    Core_PIF_Use,
+    Core_PIF_NTSC,
+    Core_PIF_PAL,
+
     // Core Gameboy ROM settings
     Core_Gameboy_P1_Rom,
     Core_Gameboy_P1_Save,
@@ -87,6 +90,7 @@ enum class SettingsID
     // Game Specific Settings
     Game_OverrideSettings,
     Game_DisableExtraMem,
+    Game_TransferPak,
     Game_SaveType,
     Game_CountPerOp,
     Game_SiDmaDuration,

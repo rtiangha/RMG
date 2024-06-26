@@ -23,6 +23,7 @@
 #include "m64p/Api.hpp"
 
 #include <filesystem>
+#include <algorithm>
 #include <cstring>
 
 //
@@ -414,6 +415,11 @@ std::vector<CorePlugin> CoreGetAllPlugins(void)
         }
     }
 
+    std::sort(plugins.begin(), plugins.end(), [](CorePlugin& a, CorePlugin& b)
+    {
+        return a.Name > b.Name;
+    });
+
     return plugins;
 }
 
@@ -461,7 +467,7 @@ bool CoreArePluginsReady(void)
             error = "CoreArePluginsReady Failed: ";
             error += "(";
             error += get_plugin_type_name((CorePluginType)(i + 1));
-            error += ")->IsHooked returned false!";
+            error += ")->IsHooked() returned false!";
             CoreSetError(error);
             return false;
         }

@@ -97,6 +97,15 @@ static l_Setting get_setting(SettingsID settingId)
     case SettingsID::GUI_ConfirmDragDrop:
         setting = {SETTING_SECTION_GUI, "ConfirmDragDrop", true};
         break;
+    case SettingsID::GUI_OpenGLES:
+        setting = {SETTING_SECTION_GUI, "OpenGLES", 
+#if defined(__arm__) || defined(__aarch64__)
+                    true
+#else
+                    false
+#endif
+                  };
+        break;
     case SettingsID::GUI_ShowVerboseLogMessages:
         setting = {SETTING_SECTION_GUI, "ShowVerboseLogMessages", false};
         break;
@@ -605,6 +614,9 @@ static l_Setting get_setting(SettingsID settingId)
 
     case SettingsID::Input_Profiles:
         setting = {SETTING_SECTION_INPUT, "Profiles", std::string("")};
+        break;
+    case SettingsID::Input_ControllerMode:
+        setting = {SETTING_SECTION_INPUT, "ControllerMode", 0};
         break;
     case SettingsID::Input_UseProfile:
         setting = {"", "UseProfile"};

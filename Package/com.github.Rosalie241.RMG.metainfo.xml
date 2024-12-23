@@ -29,6 +29,27 @@
     </screenshot>
   </screenshots>
   <releases>
+    <release version="v0.6.8" date="2024-12-22" type="stable">
+      <description>
+        <p>Changes:</p>
+        <ul>
+          <li>Fix crash on windows when opening a archive with files with an invalid character sequence</li>
+          <li>Fix video extension function definitions to prevent them from being exported</li>
+          <li>Implement netplay support (thank you loganmc10 for the hosted servers)</li>
+        </ul>
+      </description>
+    </release>
+    <release version="v0.6.7" date="2024-12-16" type="stable">
+      <description>
+        <p>Changes:</p>
+        <ul>
+          <li>Fix out of bounds read in game specific plugin settings</li>
+          <li>Fix inconsistent casing for the 'Left:' label in RMG-Input (thank you cursedUs64-git)</li>
+          <li>Fix incorrect error message in RMG-Core</li>
+          <li>Update mupen64plus-video-GLideN64, mupen64plus-core, LZMA SDK and SDL_GameControllerDB</li>
+        </ul>
+      </description>
+    </release>
     <release version="v0.6.6" date="2024-09-30" type="stable">
       <description>
         <p>Changes:</p>

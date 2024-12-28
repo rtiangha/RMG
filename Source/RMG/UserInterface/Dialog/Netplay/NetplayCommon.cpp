@@ -29,37 +29,7 @@ void NetplayCommon::AddCommonJson(QJsonObject& json)
     json.insert("emulator", "RMG");
     json.insert("auth", QString(hash.result().toHex()));
     json.insert("authTime", QString(currentTime));
-    json.insert("netplay_version", 16);
-}
-
-QString NetplayCommon::GetCpuEmulator(QString md5QString)
-{
-    const std::string md5 = md5QString.toStdString();
-    int cpuEmulator = -1;
-    bool overrideCoreSettings = CoreSettingsGetBoolValue(SettingsID::Game_OverrideCoreSettings, md5);
-    if (overrideCoreSettings)
-    {
-        cpuEmulator = CoreSettingsGetIntValue(SettingsID::Game_CPU_Emulator, md5);
-    }
-    else
-    {
-        cpuEmulator = CoreSettingsGetIntValue(SettingsID::CoreOverlay_CPU_Emulator);
-    }
-    return QString::number(cpuEmulator);
-}
-
-QString NetplayCommon::GetCpuEmulatorName(QString cpuEmulator)
-{
-    switch (cpuEmulator.toInt())
-    {
-    default:
-    case 0:
-        return "Pure Interpreter";
-    case 1:
-        return "Cached Interpreter";
-    case 2:
-        return "Dynamic Recompiler";
-    }
+    json.insert("netplay_version", 17);
 }
 
 QList<QString> NetplayCommon::GetPluginNames(QString md5QString)

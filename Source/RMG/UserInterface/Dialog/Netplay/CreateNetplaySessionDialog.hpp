@@ -43,7 +43,7 @@ class CreateNetplaySessionDialog : public QDialog, private Ui::CreateNetplaySess
   	QJsonObject sessionJson;
     QString sessionFile;
 
-  	void showErrorMessage(QString error, QString details);
+    QString getGameName(QString goodName, QString file);
 
     bool validate(void);
     void validateCreateButton(void);
@@ -59,7 +59,7 @@ class CreateNetplaySessionDialog : public QDialog, private Ui::CreateNetplaySess
     void on_sessionNameLineEdit_textChanged(void);
     void on_passwordLineEdit_textChanged(void);
 
-    void on_listWidget_currentRowChanged(int index);
+    void on_romListWidget_OnRomChanged(bool valid);
 
   	void accept(void) Q_DECL_OVERRIDE;
 };

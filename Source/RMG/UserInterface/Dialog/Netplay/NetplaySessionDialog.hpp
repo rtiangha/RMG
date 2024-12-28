@@ -26,7 +26,7 @@ class NetplaySessionDialog : public QDialog, private Ui::NetplaySessionDialog
     Q_OBJECT
 
   public:
-    NetplaySessionDialog(QWidget *parent, QWebSocket* webSocket, QJsonObject sessionJson, QString sessionFile);
+    NetplaySessionDialog(QWidget *parent, QWebSocket* webSocket, QJsonObject json, QString sessionFile);
     ~NetplaySessionDialog(void);
 
   private:
@@ -37,8 +37,6 @@ class NetplaySessionDialog : public QDialog, private Ui::NetplaySessionDialog
     int sessionNumber = -1;
 
   	QWebSocket* webSocket;
-
-  	void showErrorMessage(QString error, QString details);
 
   private slots:
   	void on_webSocket_textMessageReceived(QString message);
